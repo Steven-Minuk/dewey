@@ -170,7 +170,7 @@ function App() {
 
       {/* --- DailySpend table with filter --- */}
       <section style={{ marginTop: "32px" }}>
-        <h2>DailySpend (Sample rows)</h2>
+        <h2>DailySpend</h2>
 
         <div style={{ marginBottom: "8px" }}>
           <label>

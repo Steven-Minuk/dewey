@@ -18,7 +18,7 @@ def get_db_connection():
 
     conn_str = (
         f"DRIVER={{{driver}}};"
-        f"SERVER=tcp:{server},1433;"
+        f"SERVER=tcp:{server};"
         f"DATABASE={database};"
         f"UID={username};"
         f"PWD={password};"
