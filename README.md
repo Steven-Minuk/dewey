@@ -130,6 +130,42 @@ The React dev server runs at `http://localhost:3000` with hot reload enabled.
 
 ---
 
+## Data Pipeline (Azure Data Factory)
+
+Dewey's data is ingested and transformed through two Azure Data Factory pipelines before being served by the API.
+
+### Pipeline 1 — Brand Data
+
+```
+Get_Dewey_Web  →  CD_ToBIN  →  DF_ToCSV  →  CD_ToDB
+   (Web)         (Copy data)  (Data flow)  (Copy data)
+```
+
+| Step | Activity | Description |
+|------|----------|-------------|
+| 1 | `Get_Dewey_Web` | Fetches raw brand data from the source web endpoint |
+| 2 | `CD_ToBIN` | Copies the raw response into Azure Blob Storage (binary) |
+| 3 | `DF_ToCSV` | Data Flow transformation — parses and maps fields to CSV format |
+| 4 | `CD_ToDB` | Loads the transformed CSV into the `BrandDetail` table in Azure SQL |
+
+### Pipeline 2 — Daily Spend Data
+
+```
+Get_Dewey_Web  →  ForEach (Copy_One_File)  →  DF_ToCSV  →  CP_ToDB
+   (Web)               (per file)            (Data flow)  (Copy data)
+```
+
+| Step | Activity | Description |
+|------|----------|-------------|
+| 1 | `Get_Dewey_Web` | Fetches the list of daily spend files from the web source |
+| 2 | `ForEach1` | Iterates over each file and runs `Copy_One_File` to stage them individually into Blob Storage |
+| 3 | `DF_ToCSV` | Data Flow transformation — normalizes and maps spend fields |
+| 4 | `CP_ToDB` | Loads the transformed data into the `DailySpend` table in Azure SQL |
+
+> Both pipelines are triggered on a schedule (1 trigger configured) and can also be run manually via Debug in ADF.
+
+---
+
 ## Docker Details
 
 - The **backend** container installs Microsoft ODBC Driver 18 for SQL Server at build time, required for Azure SQL connectivity.
